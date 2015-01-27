@@ -14,8 +14,8 @@ var RECONNECT_TIMEOUT = 10;
  */
 window.addEventListener("load", function()
 {
-	if($("[data-ajax-list]") != null)													// Catch mobile versions "load more content" event (!DOMSubtreeModified)
-		$("[data-ajax-list]").bind("DOMNodeInserted", moreVideosLoaded);
+	if(document.getElementById("[data-ajax-list]") != null)													// Catch mobile versions "load more content" event (!DOMSubtreeModified)
+		document.getElementById("[data-ajax-list]").addEventListener("DOMNodeInserted", moreVideosLoaded, false);
 
 	connect();
 });
@@ -26,7 +26,7 @@ window.addEventListener("load", function()
 function connect()
 {
 	// Start the spacelet - returns the bigscreen command service
-	spaceifyCore.startSpacelet(unique_name, "spaceify.org/services/vimeo_command", false, function(err, data)
+	spaceifyCore.startSpacelet(unique_name, "command", false, function(err, data)
 	{
 		if(err)
 		{
@@ -40,10 +40,10 @@ function connect()
 			bigscreenRPC.exposeRPCMethod("close", self, close);							// close originates from the jsapp when all the bigscreens are closed or from connection class when connection is lost
 			bigscreenRPC.setCloseEventListener(close);
 
-			injectURL = spaceifyNetwork.getApplicationWebServerURL(unique_name);		// spacelets internal web server provides the images etc.
+			injectURL = spaceifyCore.getInjectURL(unique_name);							// spacelets internal web server provides the images etc.
 
 			// Start the vimeo command service
-			spaceletRPC = new SpaceifyRPC(spaceifyService.getService("spaceify.org/services/vimeo_frontend"), false, function(err, data)
+			spaceletRPC = new SpaceifyRPC(spaceifyCore.getService(unique_name, "frontend"), false, function(err, data)
 			{
 				if(err)
 				{
@@ -109,11 +109,11 @@ function playPauseVideo(video_id)
 		return initialize(false, language.E_NO_CONNECTION);
 
 	if(control.playButton.nowPlaying)												// Call videoPause/videoPlay to show the video
-		bigscreenRPC.call("showContent", ["vimeo", ":" + spaceifyNetwork.getApplicationWebServerPort(unique_name) + "/vimeospacelet.html", video_id, "videoPause", spaceifyNetwork.isSecure()], null, null);
+		bigscreenRPC.call("showContent", ["vimeo", spaceifyCore.getInjectPort(unique_name, true) + "/vimeospacelet.html", video_id, "videoPause", spaceifyCore.isSecure()], null, null);
 	else
 	{
 		control.infoText.nodeValue = setInfoText(language.WAITING);
-		bigscreenRPC.call("showContent", ["vimeo", ":" + spaceifyNetwork.getApplicationWebServerPort(unique_name) + "/vimeospacelet.html", video_id, "videoPlay", spaceifyNetwork.isSecure()], null, null);
+		bigscreenRPC.call("showContent", ["vimeo", spaceifyCore.getInjectPort(unique_name, true) + "/vimeospacelet.html", video_id, "videoPlay", spaceifyCore.isSecure()], null, null);
 	}
 	resetControls(control.playButton.id);
 }
@@ -202,28 +202,32 @@ function videoSeek(video_id, pps, durationSeconds)
  */
 function findVideoDivs()
 {
+	console.log("findVideoDivs() called");
 	var regx = /^player.*/i
 	var divs = document.getElementsByTagName("div");
 	for(di in divs)
 	{
-		if(divs[di].className == "player_container" || divs[di].className == "player_wrapper")
+		if(divs[di].className && (divs[di].className.search("player_container")!=-1 || divs[di].className.search("player_wrapper")!=-1))
 		{
+			console.log("player_container found");
 			var holder = divs[di];
 
 			nodes = holder.childNodes;//getElementsByTagName("div");
-			for(ni in nodes)
+			for(var ni=0; ni < nodes.length; ni++)
 			{
 				var player = nodes[ni];
-
-				if(player.tagName == "DIV" && player.className && regx.test(player.className))	// desktop
+				console.log(player.tagName);
+				if(typeof PlayerManager !== "undefined" && player.tagName == "DIV" && player.className && regx.test(player.className))	// desktop
 				{
+					console.log("desktop player found");
 					addControls(holder, PlayerManager.getPlayer(player).videoId, false);
 					break;
 				}
 
-				if(player.tagName == "DIV" && player.hasAttribute("data-clip_id")) 				// mobile
+				if(player.tagName == "DIV" && player.getAttribute("data-clip-id")) 				// mobile
 				{
-					addControls(holder, player.getAttribute("data-clip_id"), true);
+					console.log("mobile player found");
+					addControls(holder, player.getAttribute("data-clip-id"), true);
 					break;
 				}
 			}
