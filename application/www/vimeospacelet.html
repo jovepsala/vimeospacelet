@@ -54,7 +54,7 @@
 			{
 				if(err)
 				{
-					showMessage(language.formatErrorString(language.E_FIND_VIMEO_BACKEND, err), MESSAGE_TIMEOUT);
+					showMessage(vsLanguage.formatErrorString(vsLanguage.E_FIND_VIMEO_BACKEND, err), MESSAGE_TIMEOUT);
 					close(true);
 				}
 				else
@@ -69,12 +69,12 @@
 			{
 				if(err || data !== true)
 				{
-					showMessage(language.formatErrorString(language.E_CONNECT_VIMEO_BACKEND, (err ? err : data)), MESSAGE_TIMEOUT);
+					showMessage(vsLanguage.formatErrorString(vsLanguage.E_CONNECT_VIMEO_BACKEND, (err ? err : data)), MESSAGE_TIMEOUT);
 					close(true);
 				}
 				else
 				{
-					showMessage(language.VIMEO_BACKEND_CONNECTED, MESSAGE_TIMEOUT);
+					showMessage(vsLanguage.VIMEO_BACKEND_CONNECTED, MESSAGE_TIMEOUT);
 					spaceletRPC.exposeRPCMethod("videoSeek", self, videoSeek);
 					spaceletRPC.exposeRPCMethod("videoStop", self, videoStop);
 					spaceletRPC.setCloseEventListener(close);
@@ -91,7 +91,7 @@
 				spaceletRPC.close();
 				spaceletRPC = null;
 
-				showMessage(language.VIMEO_BACKEND_CONNECTION_LOST, MESSAGE_TIMEOUT);
+				showMessage(vsLanguage.VIMEO_BACKEND_CONNECTION_LOST, MESSAGE_TIMEOUT);
 				videoStop("");
 			}
 

@@ -1,4 +1,4 @@
-function Language()
+function VSLanguage()
 {
 	var self = this;
 
@@ -50,4 +50,4 @@ function Language()
 	}
 }
 
-var language = new Language();
+var vsLanguage = new VSLanguage();

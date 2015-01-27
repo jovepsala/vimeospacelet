@@ -26,11 +26,11 @@ window.addEventListener("load", function()
 function connect()
 {
 	// Start the spacelet - returns the bigscreen command service
-	spaceifyCore.startSpacelet(unique_name, "command", false, function(err, data)
+	$SC.startSpacelet(unique_name, "spaceify.org/services/vimeo_command", false, function(err, data)
 	{
 		if(err)
 		{
-			initialize(false, language.formatErrorString("connect:startSpacelet:", err));
+			initialize(false, vsLanguage.formatErrorString("connect:startSpacelet:", err));
 			close();
 		}
 		else
@@ -40,14 +40,14 @@ function connect()
 			bigscreenRPC.exposeRPCMethod("close", self, close);							// close originates from the jsapp when all the bigscreens are closed or from connection class when connection is lost
 			bigscreenRPC.setCloseEventListener(close);
 
-			injectURL = spaceifyCore.getInjectURL(unique_name);							// spacelets internal web server provides the images etc.
+			injectURL = $SN.getApplicationWebServerURL(unique_name);					// spacelets internal web server provides the images etc.
 
 			// Start the vimeo command service
-			spaceletRPC = new SpaceifyRPC(spaceifyCore.getService(unique_name, "frontend"), false, function(err, data)
+			spaceletRPC = new SpaceifyRPC($SS.getService("spaceify.org/services/vimeo_frontend", unique_name), false, function(err, data)
 			{
 				if(err)
 				{
-					initialize(false, language.formatErrorString("connect::RPC:", err));
+					initialize(false, vsLanguage.formatErrorString("connect::RPC:", err));
 					close();
 				}
 				else
@@ -102,18 +102,20 @@ function close(isInternal)
  */
 function playPauseVideo(video_id)
 {
+	vURL = ":" + $SN.getApplicationWebServerPort(unique_name) + "/vimeospacelet.html";
+
 	if((control = getControl(video_id)) == null)
-		return initialize(false, language.E_UNKNOWN_VIDEO_ID);
+		return initialize(false, vsLanguage.E_UNKNOWN_VIDEO_ID);
 
 	if(!bigscreenRPC)
-		return initialize(false, language.E_NO_CONNECTION);
+		return initialize(false, vsLanguage.E_NO_CONNECTION);
 
 	if(control.playButton.nowPlaying)												// Call videoPause/videoPlay to show the video
-		bigscreenRPC.call("showContent", ["vimeo", spaceifyCore.getInjectPort(unique_name, true) + "/vimeospacelet.html", video_id, "videoPause", spaceifyCore.isSecure()], null, null);
+		bigscreenRPC.call("showContent", ["vimeo", vURL, video_id, "videoPause", $SN.isSecure()], null, null);
 	else
 	{
-		control.infoText.nodeValue = setInfoText(language.WAITING);
-		bigscreenRPC.call("showContent", ["vimeo", spaceifyCore.getInjectPort(unique_name, true) + "/vimeospacelet.html", video_id, "videoPlay", spaceifyCore.isSecure()], null, null);
+		control.infoText.nodeValue = setInfoText(vsLanguage.WAITING);
+		bigscreenRPC.call("showContent", ["vimeo", vURL, video_id, "videoPlay", $SN.isSecure()], null, null);
 	}
 	resetControls(control.playButton.id);
 }
@@ -160,7 +162,7 @@ function videoPause(video_id)
 {
 	if((control = getControl(video_id)) != null)
 	{
-		control.infoText.nodeValue = setInfoText(language.PAUSED);
+		control.infoText.nodeValue = setInfoText(vsLanguage.PAUSED);
 		pauseState(control);
 	}
 }
@@ -289,7 +291,7 @@ function addControls(holder, video_id, mobile)
 	// Info: text node inside a div
 	var infoDiv = document.createElement("div");
 	infoDiv.className = "vs_infotext";
-	var infoText = document.createTextNode(language.INFO_TITLE);
+	var infoText = document.createTextNode(vsLanguage.INFO_TITLE);
 	infoDiv.appendChild(infoText);
 
 	// Controls: div
@@ -365,7 +367,7 @@ function formatTime(pps)
 	var min = tmp % 60;
 	var hrs = (tmp - min) / 60;
 
-	return (hrs < 10 ? "0" + hrs : hrs) + language.TIME_SEP + (min < 10 ? "0" + min : min) + language.TIME_SEP + (sec < 10 ? "0" + sec : sec);
+	return (hrs < 10 ? "0" + hrs : hrs) + vsLanguage.TIME_SEP + (min < 10 ? "0" + min : min) + vsLanguage.TIME_SEP + (sec < 10 ? "0" + sec : sec);
 }
 
 function initialize(status, errstr)
@@ -381,5 +383,5 @@ function initialize(status, errstr)
 
 function setInfoText(str)
 {
-	return language.INFO_TITLE + (str != "" ? language.TITLE_SEP + str : "");
+	return vsLanguage.INFO_TITLE + (str != "" ? vsLanguage.TITLE_SEP + str : "");
 }
