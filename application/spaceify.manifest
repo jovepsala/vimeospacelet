@@ -3,7 +3,7 @@
  "requires_services": [{"suggested_application": "spaceify\/bigscreen", "service_name": "spaceify.org/services/bigscreen_frontend", "service_type": "standard"}],
  "name": "Vimeospacelet",
  "unique_name":"spaceify\/vimeospacelet",
- "version": "1.0.2",
+ "version": "1.0.4",
  "type": "spacelet",
  "category": "video",
  "shared": true,
