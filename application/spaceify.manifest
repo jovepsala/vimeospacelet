@@ -11,7 +11,7 @@
  "inject_identifier": "<head>",
  "inject_files": [{"directory": "", "name": "vimeospacelet.css", "type": "css"}, {"directory": "", "name": "vimeospacelet_lang.js", "type": "javascript"}, {"directory": "", "name": "vimeospacelet.js", "type": "javascript"}],
  "start_command": "node vimeospacelet.js",
- "developer": {"name": "Spaceify Inc.", "email": "admin@spaceify.net", "url": "http:\/\/spaceify.net"},
+ "developer": {"name": "Spaceify Inc.", "email": "admin@spaceify.org", "url": "http:\/\/spaceify.org"},
  "short_description": "Play on big screen controls for Vimeo.",
  "license": "MIT",
  "creation_date": "2013-12-01 08:00:00",
